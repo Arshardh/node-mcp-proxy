@@ -1,4 +1,4 @@
-# node-mcp-client
+# node-mcp-proxy
 
 Small STDIO-to-Streamable-HTTP MCP bridge for clients like Claude Desktop.
 
@@ -100,7 +100,7 @@ On Windows, Claude Desktop typically reads:
     "remote-example": {
       "command": "node",
       "args": [
-        "/absolute/path/to/node-mcp-client/src/cli.js",
+        "/absolute/path/to/node-mcp-proxy/src/cli.js",
         "https://remote.mcp.server/mcp",
         "--header",
         "Authorization: Bearer ${AUTH_TOKEN}"
@@ -113,7 +113,7 @@ On Windows, Claude Desktop typically reads:
 }
 ```
 
-Replace `/absolute/path/to/node-mcp-client/src/cli.js` with the actual absolute path on the machine where Claude Desktop is running.
+Replace `/absolute/path/to/node-mcp-proxy/src/cli.js` with the actual absolute path on the machine where Claude Desktop is running.
 Do not use the example path verbatim.
 
 Windows example:
@@ -124,7 +124,7 @@ Windows example:
     "remote-example": {
       "command": "node",
       "args": [
-        "C:\\absolute\\path\\to\\node-mcp-client\\src\\cli.js",
+        "C:\\absolute\\path\\to\\node-mcp-proxy\\src\\cli.js",
         "https://remote.mcp.server/mcp",
         "--header",
         "Authorization: Bearer ${AUTH_TOKEN}",
@@ -138,7 +138,7 @@ Windows example:
 }
 ```
 
-Replace `C:\\absolute\\path\\to\\node-mcp-client\\src\\cli.js` with the actual absolute path on the Windows machine where Claude Desktop is running.
+Replace `C:\\absolute\\path\\to\\node-mcp-proxy\\src\\cli.js` with the actual absolute path on the Windows machine where Claude Desktop is running.
 
 If the user has installed this project as a global command, they can avoid the script path entirely:
 
@@ -146,7 +146,7 @@ If the user has installed this project as a global command, they can avoid the s
 {
   "mcpServers": {
     "remote-example": {
-      "command": "node-mcp-client",
+      "command": "node-mcp-proxy",
       "args": [
         "https://remote.mcp.server/mcp",
         "--header",
@@ -160,7 +160,7 @@ If the user has installed this project as a global command, they can avoid the s
 }
 ```
 
-That only works if `node-mcp-client` is already on the user's `PATH`.
+That only works if `node-mcp-proxy` is already on the user's `PATH`.
 
 For HTTP servers inside a trusted network:
 
@@ -170,7 +170,7 @@ For HTTP servers inside a trusted network:
     "remote-example": {
       "command": "node",
       "args": [
-        "/absolute/path/to/node-mcp-client/src/cli.js",
+        "/absolute/path/to/node-mcp-proxy/src/cli.js",
         "http://internal.example/mcp",
         "--allow-http"
       ]

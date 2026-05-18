@@ -36,12 +36,12 @@ function createLogger(enabled) {
       return
     }
 
-    process.stderr.write(`[node-mcp-client] ${args.map(formatForLog).join(' ')}\n`)
+    process.stderr.write(`[node-mcp-proxy] ${args.map(formatForLog).join(' ')}\n`)
   }
 }
 
 function writeStderr(...args) {
-  process.stderr.write(`[node-mcp-client] ${args.map(formatForLog).join(' ')}\n`)
+  process.stderr.write(`[node-mcp-proxy] ${args.map(formatForLog).join(' ')}\n`)
 }
 
 function expandEnv(value) {

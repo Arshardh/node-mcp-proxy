@@ -1,10 +1,10 @@
 {
-  "name": "node-mcp-client",
+  "name": "node-mcp-proxy",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "bin": {
-    "node-mcp-client": "./src/cli.js"
+    "node-mcp-proxy": "./src/cli.js"
   },
   "scripts": {
     "start": "node ./src/cli.js",

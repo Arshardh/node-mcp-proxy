@@ -6,6 +6,7 @@ import '../src/polyfills.js'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { ListToolsResultSchema } from '@modelcontextprotocol/sdk/types.js'
+import { PostOnlyStreamableHttpTransport } from '../src/postOnlyStreamableHttpTransport.js'
 
 async function createMockRemoteServer() {
   const state = {
@@ -144,6 +145,9 @@ async function createMockRemoteServer() {
 }
 
 async function main() {
+  await testInsecureTlsIsEnabledByDefault()
+  await testSecureTlsOverrideDisablesHttpsAgent()
+
   const remote = await createMockRemoteServer()
   const transport = new StdioClientTransport({
     command: 'node',
@@ -182,6 +186,82 @@ async function main() {
     await client.close().catch(() => {})
     await remote.close()
   }
+}
+
+async function testInsecureTlsIsEnabledByDefault() {
+  let capturedInit
+
+  const transport = new PostOnlyStreamableHttpTransport('https://example.com/mcp', {
+    fetchImpl: async (_url, init) => {
+      capturedInit = init
+      return {
+        ok: true,
+        status: 200,
+        headers: {
+          get(name) {
+            if (String(name).toLowerCase() === 'content-type') {
+              return 'application/json'
+            }
+            return null
+          },
+        },
+        json: async () => ({ jsonrpc: '2.0', id: 1, result: { protocolVersion: '2025-11-25', capabilities: {}, serverInfo: { name: 'mock', version: '1.0.0' } } }),
+        text: async () => '',
+      }
+    },
+  })
+
+  await transport.send({
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'initialize',
+    params: {
+      protocolVersion: '2025-11-25',
+      capabilities: {},
+      clientInfo: { name: 'test', version: '1.0.0' },
+    },
+  })
+
+  assert.ok(capturedInit.agent)
+  assert.equal(capturedInit.agent.options.rejectUnauthorized, false)
+}
+
+async function testSecureTlsOverrideDisablesHttpsAgent() {
+  let capturedInit
+
+  const transport = new PostOnlyStreamableHttpTransport('https://example.com/mcp', {
+    insecureTls: false,
+    fetchImpl: async (_url, init) => {
+      capturedInit = init
+      return {
+        ok: true,
+        status: 200,
+        headers: {
+          get(name) {
+            if (String(name).toLowerCase() === 'content-type') {
+              return 'application/json'
+            }
+            return null
+          },
+        },
+        json: async () => ({ jsonrpc: '2.0', id: 1, result: { protocolVersion: '2025-11-25', capabilities: {}, serverInfo: { name: 'mock', version: '1.0.0' } } }),
+        text: async () => '',
+      }
+    },
+  })
+
+  await transport.send({
+    jsonrpc: '2.0',
+    id: 1,
+    method: 'initialize',
+    params: {
+      protocolVersion: '2025-11-25',
+      capabilities: {},
+      clientInfo: { name: 'test', version: '1.0.0' },
+    },
+  })
+
+  assert.equal(capturedInit.agent, undefined)
 }
 
 main().catch((error) => {

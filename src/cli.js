@@ -6,11 +6,12 @@ import { PostOnlyStreamableHttpTransport } from './postOnlyStreamableHttpTranspo
 
 function usage() {
   return [
-    'Usage: node ./src/cli.js <https://server-url> [--header "Name: Value"] [--allow-http] [--debug]',
+    'Usage: node ./src/cli.js <https://server-url> [--header "Name: Value"] [--allow-http] [--secure-tls] [--debug]',
     '',
     'Examples:',
     '  node ./src/cli.js https://remote.mcp.server/mcp',
     '  node ./src/cli.js https://remote.mcp.server/mcp --header "Authorization: Bearer ${TOKEN}"',
+    '  node ./src/cli.js https://remote.mcp.server/mcp --secure-tls',
   ].join('\n')
 }
 
@@ -73,6 +74,7 @@ function parseHeader(rawHeader) {
 function parseArgs(argv) {
   let serverUrlText = undefined
   let allowHttp = false
+  let insecureTls = true
   let debug = false
   const headers = {}
 
@@ -91,6 +93,16 @@ function parseArgs(argv) {
 
     if (arg === '--debug') {
       debug = true
+      continue
+    }
+
+    if (arg === '--insecure-tls') {
+      insecureTls = true
+      continue
+    }
+
+    if (arg === '--secure-tls') {
+      insecureTls = false
       continue
     }
 
@@ -125,15 +137,20 @@ function parseArgs(argv) {
   return {
     serverUrl,
     headers,
+    insecureTls,
     debug,
   }
 }
 
 async function main() {
-  const { serverUrl, headers, debug } = parseArgs(process.argv.slice(2))
+  const { serverUrl, headers, insecureTls, debug } = parseArgs(process.argv.slice(2))
   const log = createLogger(debug)
   const localTransport = new StdioServerTransport()
-  const remoteTransport = new PostOnlyStreamableHttpTransport(serverUrl, { headers, debug })
+  const remoteTransport = new PostOnlyStreamableHttpTransport(serverUrl, { headers, insecureTls, debug })
+
+  if (insecureTls) {
+    writeStderr('TLS certificate validation is disabled for outbound HTTPS requests by default')
+  }
 
   let shuttingDown = false
 

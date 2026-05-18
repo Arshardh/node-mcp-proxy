@@ -1,3 +1,4 @@
+import https from 'https'
 import fetch, { Headers } from 'node-fetch'
 
 function isObject(value) {
@@ -141,7 +142,10 @@ export class PostOnlyStreamableHttpTransport {
   constructor(url, options = {}) {
     this.url = typeof url === 'string' ? new URL(url) : url
     this.baseHeaders = options.headers ?? {}
-    this.fetchImpl = options.fetchImpl ?? fetch
+    this.insecureTls = options.insecureTls ?? true
+    this.httpsAgent = this.insecureTls ? new https.Agent({ rejectUnauthorized: false }) : undefined
+    this.baseFetchImpl = options.fetchImpl ?? fetch
+    this.fetchImpl = (requestUrl, init = {}) => this._fetch(requestUrl, init)
     this.debug = options.debug ?? false
     this.started = false
     this.closed = false
@@ -152,6 +156,16 @@ export class PostOnlyStreamableHttpTransport {
     this.onmessage = undefined
     this.onerror = undefined
     this.onclose = undefined
+  }
+
+  _fetch(requestUrl, init = {}) {
+    const fetchInit = { ...init }
+
+    if (this.httpsAgent && new URL(requestUrl).protocol === 'https:') {
+      fetchInit.agent = this.httpsAgent
+    }
+
+    return this.baseFetchImpl(requestUrl, fetchInit)
   }
 
   async start() {

@@ -76,9 +76,13 @@ echo {"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"
 
 - `--header "Name: Value"` adds a header to every remote request. Repeat as needed.
 - `--allow-http` allows `http://` URLs.
+- `--secure-tls` enables normal TLS certificate validation for outbound HTTPS requests.
 - `--debug` writes bridge logs to stderr.
 
 Environment variables in header values are expanded with `${NAME}`.
+
+TLS certificate validation is disabled by default in this client.
+If you need normal certificate validation, add `--secure-tls`.
 
 ## Claude Desktop config
 

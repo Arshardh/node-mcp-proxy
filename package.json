@@ -14,7 +14,7 @@
     "node": ">=14"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.0.4",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "abort-controller": "^3.0.0",
     "node-fetch": "^3.3.2"
   }
